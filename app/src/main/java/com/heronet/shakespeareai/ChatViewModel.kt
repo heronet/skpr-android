@@ -27,9 +27,8 @@ class ChatViewModel : ViewModel() {
         messages = messages + message
 
         val openai = OpenAI(
-            token = "api-key",
+            token = BuildConfig.OPENAI_KEY,
             timeout = Timeout(socket = 60.seconds),
-            // additional configurations...
         )
 
         val request = ChatCompletionRequest(
