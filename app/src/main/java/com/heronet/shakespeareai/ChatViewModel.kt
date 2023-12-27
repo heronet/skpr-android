@@ -5,33 +5,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
 import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
-import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
 class ChatViewModel : ViewModel() {
 
     var messages by mutableStateOf(listOf<ChatMessage>())
         private set
-
-    init {
-        viewModelScope.launch {
-            sendMessage("Hi!")
-        }
-    }
+    var isLoading by mutableStateOf(false)
+        private set
 
     suspend fun sendMessage(text: String) {
+        isLoading = true
+        
         val message = ChatMessage(role = ChatRole("user"), content = text)
         messages = messages + message
 
         val openai = OpenAI(
-            token = "open-ai-token",
+            token = "api-key",
             timeout = Timeout(socket = 60.seconds),
             // additional configurations...
         )
@@ -52,6 +48,8 @@ class ChatViewModel : ViewModel() {
         } catch (e: Exception) {
             Log.d("DDD", e.message.toString())
             e.printStackTrace()
+        } finally {
+            isLoading = false
         }
     }
 }
